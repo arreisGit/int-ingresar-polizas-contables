@@ -21,7 +21,9 @@ GO
 
 CREATE PROCEDURE [dbo].CUP_SPI_PolizasContables
 (
-    
+ @Poliza XML   
 )                
 AS BEGIN   
+
+  SELECT 'Oh yeah!'
 END
