@@ -29,8 +29,20 @@ AS
           </xsd:simpleType>
         </xsd:element>
         <xsd:element name="EffectiveDate" type="xsd:date" minOccurs="1"/>
-        <xsd:element name="Concept" type="xsd:token" minOccurs="0"/>
-        <xsd:element name="Reference" type="xsd:token" minOccurs="0"/>
+        <xsd:element name="Concept" minOccurs="0">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:token">
+              <xsd:maxLength value="50"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element name="Reference" minOccurs="0">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:token">
+              <xsd:maxLength value="50"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
         <xsd:element name="Records" minOccurs="1"  maxOccurs="unbounded">
           <xsd:complexType>
             <xsd:sequence>
@@ -41,13 +53,26 @@ AS
                       <xsd:simpleType>
                         <xsd:restriction base="xsd:token">
                           <xsd:pattern value="[0-9]{3}-[0-9]{3}-[0-9]{3}-[0-9]{4}"/>
+                          <xsd:maxLength value="20"/>
                         </xsd:restriction>
                       </xsd:simpleType>
                     </xsd:element>
-                    <xsd:element name="CostCenter" type="xsd:token" minOccurs="0"/>
+                    <xsd:element name="CostCenter" minOccurs="0">
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:token">
+                          <xsd:maxLength value="50"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
                     <xsd:element name="Debit" type="xsd:decimal" minOccurs="1"/>
                     <xsd:element name="Credit" type="xsd:decimal" minOccurs="1"/>
-                    <xsd:element name="Concept" type="xsd:token" minOccurs="0"/>
+                    <xsd:element name="Concept" minOccurs="0">
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:token">
+                          <xsd:maxLength value="50"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
                     <xsd:element name="OriginalCurrency" minOccurs="0">
                       <xsd:simpleType>
                         <xsd:restriction base="xsd:token">
