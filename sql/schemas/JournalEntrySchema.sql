@@ -10,15 +10,8 @@ AS
 '<xsd:schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <xsd:element name="JournalEntry">
-    <xsd:complexType>
+    <xsd:complexType mixed="true">
       <xsd:sequence>
-        <xsd:element name="System">
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:unsignedByte">
-              <xsd:minInclusive value="1"/>
-            </xsd:restriction>
-          </xsd:simpleType>
-        </xsd:element>
         <xsd:element name="Type" minOccurs="1">
           <xsd:simpleType>
             <xsd:restriction base="xsd:token">
@@ -29,7 +22,8 @@ AS
           </xsd:simpleType>
         </xsd:element>
         <xsd:element name="EffectiveDate" type="xsd:date" minOccurs="1"/>
-        <xsd:element name="Concept" minOccurs="0">
+        <xsd:element name="Branch" type="xsd:unsignedByte" minOccurs="1"/>
+        <xsd:element name="Concept" minOccurs="1">
           <xsd:simpleType>
             <xsd:restriction base="xsd:token">
               <xsd:maxLength value="50"/>
@@ -89,6 +83,13 @@ AS
           </xsd:complexType>
         </xsd:element>
       </xsd:sequence>
+      <xsd:attribute name="System" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:unsignedByte">
+            <xsd:minInclusive value="1"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
     </xsd:complexType>
   </xsd:element>
 </xsd:schema>'

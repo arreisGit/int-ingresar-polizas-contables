@@ -34,50 +34,6 @@ AS BEGIN
     MovID VARCHAR(20) NULL
   )
 
-  CREATE TABLE #tmp_CUP_ContHeader
-  (
-    Orden               INT NOT NULL,
-    Concepto            VARCHAR(50) NOT NULL,
-    ImporteDlls         DECIMAL(18,4) NOT NULL,
-    ImporteConversionMN DECIMAL(18,4) NOT NULL,
-    ImporteMN           DECIMAL(18,4) NOT NULL,
-    TotalMN             DECIMAL(18,4) NOT NULL,
-    Contabilidad        DECIMAL(18,4) NOT NULL,
-    Variacion           DECIMAL(18,4) NULL,
-    PRIMARY KEY ( 
-                  Orden,
-                  Concepto
-                )
-
-
-DECLARE @input XML = '<dataset> 
-  <metadata>
-  <item name="NAME_LAST" type="xs:string" length="62" /> 
-  <item name="NAME_FIRST" type="xs:string" length="62" /> 
-  <item name="NAME_MIDDLE" type="xs:string" length="32" />
-  </metadata>
-<data>
-<row>
-  <value>SMITH</value> 
-  <value>MARY</value> 
-  <value>N</value> 
-</row>
-<row>
-  <value>SMITH2</value> 
-  <value>MARY2</value> 
-  <value>N2</value> 
-</row>
-</data>
-</dataset>'
-
-INSERT INTO dbo.YourTable(ColName, ColFirstName, ColOther)
-   SELECT
-      Name = XCol.value('(value)[1]','varchar(25)'),
-      FirstName = XCol.value('(value)[2]','varchar(25)'),
-      OtherValue = XCol.value('(value)[3]','varchar(25)')
-   FROM 
-      @input.nodes('/dataset/data/row') AS XTbl(XCol)
-
   INSERT INTO @Messages 
   (
     Num,
