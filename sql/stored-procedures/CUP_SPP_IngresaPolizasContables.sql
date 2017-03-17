@@ -5,8 +5,8 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 /**************** DROP IF EXISTS ****************/
-IF EXISTS (SELECT name FROM sysobjects WHERE name = 'CUP_SPI_PolizasContables') 
-  DROP PROCEDURE  CUP_SPI_PolizasContables
+IF EXISTS (SELECT name FROM sysobjects WHERE name = 'CUP_SPP_IngresaPolizasContables') 
+  DROP PROCEDURE  CUP_SPP_IngresaPolizasContables
 GO
 
 /* =============================================
@@ -20,7 +20,7 @@ GO
 
 ============================================= */
 
-CREATE PROCEDURE [dbo].CUP_SPI_PolizasContables
+CREATE PROCEDURE [dbo].CUP_SPP_IngresaPolizasContables
 (
  @Poliza XML(JournalEntrySchema)
 )                
