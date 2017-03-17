@@ -161,11 +161,16 @@ AS BEGIN TRY
   )
 
   -- Validacion de la informacion
-
+  EXEC CUP_SPP_wsPolizasContables_Validar
+  
   -- Creacion de la poliza
+  EXEC CUP_SPI_wsPolizasContables_Insertar
 
   -- Verificacion y afectacion de la poliza
+  EXEC CUP_SPP_wsPolizasContables_Afectar
+    @VerificarSinAfectar = 1
 
+  -- Termino del proceso, preparacion y regreso de los mensajes.
   IF NOT EXISTS(SELECT [Description] FROM #tmp_wsPolizasIntelisis_Messages)
     INSERT INTO #tmp_wsPolizasIntelisis_Messages ( NUM , [Description] )
     VALUES ( '2', 'Unhandled Error... Please contact the CML-Planos team')
