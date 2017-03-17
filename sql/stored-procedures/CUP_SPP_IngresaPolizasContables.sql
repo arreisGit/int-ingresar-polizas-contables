@@ -14,9 +14,10 @@ GO
   Created by:    Enrique Sierra Gtez
   Creation Date: 2017-03-16
 
-  Description: Procedimiento almacenado 
-  encargado de insertar Polizas contables a 
-  Intelisis
+  Description: Procedimiento maestro encargado
+  de interpretar e ingresar polizas contables
+  a Intelisis provenientes de otros sistemas
+  mediante el llamado a un web service.
 
 ============================================= */
 
