@@ -10,6 +10,9 @@ IF EXISTS (SELECT name FROM sysobjects WHERE name = 'CUP_SPP_wsPolizasContables_
 IF EXISTS (SELECT name FROM sysobjects WHERE name = 'CUP_SPP_wsPolizasContables_Insertar') 
   DROP PROCEDURE  CUP_SPP_wsPolizasContables_Insertar
 
+IF EXISTS (SELECT name FROM sysobjects WHERE name = 'CUP_SPP_wsPolizasContables_Afectar') 
+  DROP PROCEDURE  CUP_SPP_wsPolizasContables_Afectar
+
 IF EXISTS (SELECT name 
            FROM sys.xml_schema_collections
            WHERE name='JournalEntrySchema')
