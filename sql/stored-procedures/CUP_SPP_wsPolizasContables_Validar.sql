@@ -5,8 +5,8 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 /**************** DROP IF EXISTS ****************/
-IF EXISTS (SELECT name FROM sysobjects WHERE name = 'CUP_SPP_wsPolizasContables_Validacion') 
-  DROP PROCEDURE  CUP_SPP_wsPolizasContables_Validacion
+IF EXISTS (SELECT name FROM sysobjects WHERE name = 'CUP_SPP_wsPolizasContables_Validar') 
+  DROP PROCEDURE  CUP_SPP_wsPolizasContables_Validar
 GO
 
 /* =============================================
@@ -21,9 +21,9 @@ GO
 
 ============================================= */
 
-CREATE PROCEDURE [dbo].CUP_SPP_wsPolizasContables_Validacion              
+CREATE PROCEDURE [dbo].CUP_SPP_wsPolizasContables_Validar              
 AS BEGIN TRY
-  PRINT('.')
+  PRINT('.Validando.')
 END TRY
 BEGIN CATCH
  IF OBJECT_ID('tempdb..#tmp_wsPolizasIntelisis_Messages') IS NOT NULL
