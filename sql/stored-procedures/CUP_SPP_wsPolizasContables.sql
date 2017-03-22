@@ -27,7 +27,9 @@ CREATE PROCEDURE [dbo].CUP_SPP_wsPolizasContables
 )                
 AS BEGIN TRY
   DECLARE 
-    @PolizaID INT
+    @PolizaID INT,
+    @Ok INT,
+    @OkRef VARCHAR(255)
 
   -- Datos del cabecero de la poliza
   IF OBJECT_ID('tempdb..#tmp_wsPolizasIntelisis_Header') IS NOT NULL
@@ -136,16 +138,41 @@ AS BEGIN TRY
 
   -- Validacion de la informacion
   EXEC CUP_SPP_wsPolizasContables_Validar
-  
-  -- Creacion de la poliza
-  EXEC CUP_SPI_wsPolizasContables_Insertar @PolizaID OUTPUT
+   
+  IF NOT EXISTS(SELECT
+                  [Description]
+                FROM
+                  #tmp_wsPolizasIntelisis_Messages 
+                WHERE 
+                  Num > 0)
+  BEGIN TRY 
 
-  -- Verificacion y afectacion de la poliza
-  IF @PolizaID IS NOT NULL
-  BEGIN
-    EXEC CUP_SPP_wsPolizasContables_Afectar
-      @VerificarSinAfectar = 1
-  END 
+    BEGIN TRAN wsCont
+    -- Creacion de la poliza
+    EXEC CUP_SPI_wsPolizasContables_Insertar @PolizaID OUTPUT
+
+    -- Verificacion y afectacion de la poliza
+    IF @PolizaID IS NOT NULL
+    BEGIN
+      EXEC CUP_SPP_wsPolizasContables_Afectar
+        @VerificarSinAfectar = 1,
+        @Ok  = @Ok OUTPUT,
+        @OkRef  = @OK OUTPUT
+    END 
+    
+
+    IF XACT_STATE() = 1 
+      COMMIT TRAN wsCont
+
+  END TRY 
+  BEGIN CATCH 
+    IF XACT_STATE() <> 0  
+      ROLLBACK TRAN wsCont
+
+    INSERT INTO #tmp_wsPolizasIntelisis_Messages ( NUM , [Description] )
+    VALUES ( ERROR_NUMBER(), ERROR_NUMBER())
+    
+  END CATCH
 
   -- Termino del proceso, preparacion y regreso de los mensajes.
   IF NOT EXISTS(SELECT [Description] FROM #tmp_wsPolizasIntelisis_Messages)

@@ -22,7 +22,9 @@ GO
 ============================================= */
 
 CREATE PROCEDURE [dbo].CUP_SPP_wsPolizasContables_Afectar 
-  @VerificarSinAfectar BIT = 0            
+  @VerificarSinAfectar BIT = 0,
+  @Ok INT OUTPUT,
+  @OkRef VARCHAR(255) OUTPUT 
 AS BEGIN TRY
   PRINT('.Afectando.')
 
