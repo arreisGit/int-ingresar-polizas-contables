@@ -26,7 +26,9 @@ CREATE PROCEDURE [dbo].CUP_SPP_wsPolizasContables
  @Poliza XML(JournalEntrySchema)
 )                
 AS BEGIN TRY
-  
+  DECLARE 
+    @PolizaID INT
+
   -- Datos del cabecero de la poliza
   IF OBJECT_ID('tempdb..#tmp_wsPolizasIntelisis_Header') IS NOT NULL
     DROP TABLE #tmp_wsPolizasIntelisis_Header
@@ -75,13 +77,6 @@ AS BEGIN TRY
     TipoCambioOriginal FLOAT NULL
   )
 
-  DECLARE 
-    @SystemID INT,
-    @FechaContable DATE,
-    @SucursalContable INT,
-    @Concepto VARCHAR(50),
-    @Referencia VARCHAR(50)
-
   CREATE NONCLUSTERED INDEX IX_#tmp_wsPolizasIntelisis_Records_Cuenta_Subcuenta
     ON #tmp_wsPolizasIntelisis_Records ( Cuenta, SubCuenta )
   INCLUDE 
@@ -126,27 +121,6 @@ AS BEGIN TRY
   FROM
     @Poliza.nodes('/JournalEntry/Records/Record') AS R(c)
 
-  SELECT
-    Sistema,
-    Tipo,
-    FechaContable,
-    SucursalContable,
-    Concepto,
-    Referencia
-  FROM 
-   #tmp_wsPolizasIntelisis_Header
-
-  SELECT 
-    Cuenta,
-    SubCuenta,
-    Debe,
-    Haber,
-    Concepto,
-    MonedaOriginal,
-    TipoCambioOriginal
-  FROM 
-    #tmp_wsPolizasIntelisis_Records
-
   -- Contenedor de los mensajes de respuesta del proceso. 
   IF OBJECT_ID('tempdb..#tmp_wsPolizasIntelisis_Messages') IS NOT NULL
     DROP TABLE #tmp_wsPolizasIntelisis_Messages
@@ -164,11 +138,14 @@ AS BEGIN TRY
   EXEC CUP_SPP_wsPolizasContables_Validar
   
   -- Creacion de la poliza
-  EXEC CUP_SPI_wsPolizasContables_Insertar
+  EXEC CUP_SPI_wsPolizasContables_Insertar @PolizaID OUTPUT
 
   -- Verificacion y afectacion de la poliza
-  EXEC CUP_SPP_wsPolizasContables_Afectar
-    @VerificarSinAfectar = 1
+  IF @PolizaID IS NOT NULL
+  BEGIN
+    EXEC CUP_SPP_wsPolizasContables_Afectar
+      @VerificarSinAfectar = 1
+  END 
 
   -- Termino del proceso, preparacion y regreso de los mensajes.
   IF NOT EXISTS(SELECT [Description] FROM #tmp_wsPolizasIntelisis_Messages)
