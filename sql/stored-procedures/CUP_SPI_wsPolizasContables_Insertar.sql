@@ -25,7 +25,7 @@ CREATE PROCEDURE [dbo].CUP_SPI_wsPolizasContables_Insertar
     @PolizaID INT OUTPUT         
 AS BEGIN TRY
   DECLARE 
-    @CUP_Proceso INT = 17,
+    @CUP_Proceso INT = 18,
     @HOY DATETIME = GETDATE()
  
   INSERT INTO 
