@@ -37,6 +37,7 @@ AS BEGIN TRY
     FechaEmision,
     FechaContable,
     FechaRegistro,
+    Empresa,
     Sucursal,
     Concepto,
     Referencia,
@@ -53,6 +54,7 @@ AS BEGIN TRY
     FechaEmision = CAST(@HOY AS DATE),
     FechaContable = CAST(FechaContable AS DATE),
     FechaRegistro = @HOY,
+    Empresa = 'CML',
     Sucursal = SucursalContable,
     Concepto = NULLIF(Concepto,''),
     Referencia = NULLIF(Referencia,''),
@@ -79,6 +81,7 @@ AS BEGIN TRY
       ,Concepto
       ,Debe
       ,Haber
+      ,Empresa
       ,Sucursal
       ,SucursalContable
       ,SucursalOrigen
@@ -100,10 +103,11 @@ AS BEGIN TRY
                                       su.Subcuenta
                                     ) - 1
     ,detalle.Cuenta
-    ,detalle.SubCuenta
+    ,NULLIF(detalle.SubCuenta,'')
     ,Concepto = NULLIF(detalle.Concepto,'')
     ,detalle.Debe
     ,detalle.Haber
+    ,Empresa = 'CML'
     ,cabecero.SucursalContable
     ,cabecero.SucursalContable
     ,cabecero.SucursalContable

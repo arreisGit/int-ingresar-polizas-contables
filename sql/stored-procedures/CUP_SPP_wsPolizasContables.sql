@@ -148,6 +148,7 @@ AS BEGIN TRY
   BEGIN TRY 
 
     BEGIN TRAN wsCont
+
     -- Creacion de la poliza
     EXEC CUP_SPI_wsPolizasContables_Insertar @PolizaID OUTPUT
 
@@ -156,12 +157,16 @@ AS BEGIN TRY
     BEGIN
       EXEC CUP_SPP_wsPolizasContables_Afectar
         @VerificarSinAfectar = 1,
-        @Ok  = @Ok OUTPUT,
+        @PolizaID = @PolizaID,
+        @Ok = @Ok OUTPUT,
         @OkRef  = @OK OUTPUT
     END 
-    
 
-    IF XACT_STATE() = 1 
+    IF NOT( @OK IS  NULL OR @Ok BETWEEN 80030 AND 81000 )
+      THROW 50001, @OkRef, 4;
+    
+    IF XACT_STATE() = 1
+    AND @@trancount > 0
       COMMIT TRAN wsCont
 
   END TRY 
@@ -170,7 +175,7 @@ AS BEGIN TRY
       ROLLBACK TRAN wsCont
 
     INSERT INTO #tmp_wsPolizasIntelisis_Messages ( NUM , [Description] )
-    VALUES ( ERROR_NUMBER(), ERROR_NUMBER())
+    VALUES ( ERROR_STATE(), ERROR_MESSAGE())
     
   END CATCH
 

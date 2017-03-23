@@ -23,22 +23,78 @@ GO
 
 CREATE PROCEDURE [dbo].CUP_SPP_wsPolizasContables_Afectar 
   @VerificarSinAfectar BIT = 0,
+  @PolizaID INT,
   @Ok INT OUTPUT,
   @OkRef VARCHAR(255) OUTPUT 
 AS BEGIN TRY
-  PRINT('.Afectando.')
 
-  -- Mensaje temporal de pruebas.
-  IF NOT EXISTS
-  (
-    SELECT
-      [Description]
-    FROM
-      #tmp_wsPolizasIntelisis_Messages
-    WHERE
-      ISNULL(Num,0) > 0
-  )
+  --Asignamos el consecutivo    
+  EXEC spAfectar
+    @Modulo = 'CONT',
+    @ID = @PolizaID,
+    @Accion = 'CONSECUTIVO',
+    @EnSilencio = 1 
+ 
+  IF ISNULL(@VerificarSinAfectar,0) = 1 
   BEGIN
+    EXEC spAfectar
+      @Modulo = 'CONT',
+      @ID = @PolizaID,
+      @Accion = 'VERIFICAR',
+      @Base = NULL,
+      @GenerarMov = NULL,
+      @Usuario = 'PRODAUT',
+      @SincroFinal = 0,
+      @EnSilencio = 1,
+      @Ok = @OK OUTPUT,
+      @OkRef = @OkRef OUTPUT
+
+
+  END
+  ELSE
+  BEGIN
+    EXEC spAfectar
+        @Modulo = 'CONT', 
+        @ID = @PolizaID ,
+        @Accion = 'AFECTAR',
+        @Base = 'Todo',
+        @GenerarMov = NULL, 
+        @Usuario = 'PRODAUT',
+        @SincroFinal = 0, 
+        @EnSilencio = 1,
+        @OK = @OK OUTPUT,
+        @OkRef = @OkRef OUTPUT
+  END
+
+  IF (
+        @OK IS NULL 
+     OR @Ok BETWEEN 80030 AND 81000 
+     ) 
+  AND NOT EXISTS (
+                    SELECT
+                      [Description]
+                    FROM
+                      #tmp_wsPolizasIntelisis_Messages
+                    WHERE
+                      ISNULL(Num,0) > 0
+                  )
+  BEGIN
+
+    IF ISNULL(@VerificarSinAfectar,0) = 1
+    BEGIN
+      DECLARE
+        @FechaRegistro DATETIME = GETDATE()
+      
+      EXEC spCambiarSituacion 
+        @Modulo = 'CONT',
+        @Id = @PolizaID,
+        @Situacion = 'Por Autorizar',
+        @SituacionFecha = @FechaRegistro,
+        @Usuario = 'PRODAUT', 
+        @SituacionUsuario = NULL, 
+        @SituacionNota = NULL     
+    END
+
     INSERT INTO
       #tmp_wsPolizasIntelisis_Messages
     ( 
@@ -51,13 +107,13 @@ AS BEGIN TRY
     SELECT 
       Num = 0,
       [Description] = 'Poliza Creada Exitosamente',
-      ID = 1,
-      Mov = header.Tipo,
-      MovID = LTRIM(RTRIM(ISNULL(suc.Prefijo,''))) + '1'
+      ID = Cont.ID,
+      Mov = Cont.Mov,
+      MovID = Cont.MovID
     FROM
-      #tmp_wsPolizasIntelisis_Header header
-     LEFT JOIN Sucursal suc ON suc.Sucursal = header.SucursalContable
-
+      Cont 
+    WHERE 
+      ID = @PolizaID
   END
     
 END TRY
