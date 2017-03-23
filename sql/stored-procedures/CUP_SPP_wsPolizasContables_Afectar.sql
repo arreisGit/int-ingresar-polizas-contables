@@ -28,6 +28,8 @@ CREATE PROCEDURE [dbo].CUP_SPP_wsPolizasContables_Afectar
   @OkRef VARCHAR(255) OUTPUT 
 AS BEGIN TRY
 
+  PRINT('.Afectando.')
+
   --Asignamos el consecutivo    
   EXEC spAfectar
     @Modulo = 'CONT',
@@ -48,8 +50,6 @@ AS BEGIN TRY
       @EnSilencio = 1,
       @Ok = @OK OUTPUT,
       @OkRef = @OkRef OUTPUT
-
-
   END
   ELSE
   BEGIN
@@ -93,6 +93,7 @@ AS BEGIN TRY
         @Usuario = 'PRODAUT', 
         @SituacionUsuario = NULL, 
         @SituacionNota = NULL     
+
     END
 
     INSERT INTO

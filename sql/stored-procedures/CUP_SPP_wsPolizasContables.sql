@@ -159,11 +159,11 @@ AS BEGIN TRY
         @VerificarSinAfectar = 1,
         @PolizaID = @PolizaID,
         @Ok = @Ok OUTPUT,
-        @OkRef  = @OK OUTPUT
+        @OkRef  = @OKREF OUTPUT
     END 
 
     IF NOT( @OK IS  NULL OR @Ok BETWEEN 80030 AND 81000 )
-      THROW 50001, @OkRef, 4;
+      THROW @Ok, @OkRef, 4;
     
     IF XACT_STATE() = 1
     AND @@trancount > 0
@@ -175,14 +175,15 @@ AS BEGIN TRY
       ROLLBACK TRAN wsCont
 
     INSERT INTO #tmp_wsPolizasIntelisis_Messages ( NUM , [Description] )
-    VALUES ( ERROR_STATE(), ERROR_MESSAGE())
+    VALUES ( ERROR_NUMBER(), ERROR_MESSAGE())
     
   END CATCH
+
 
   -- Termino del proceso, preparacion y regreso de los mensajes.
   IF NOT EXISTS(SELECT [Description] FROM #tmp_wsPolizasIntelisis_Messages)
     INSERT INTO #tmp_wsPolizasIntelisis_Messages ( NUM , [Description] )
-    VALUES ( '2', 'Unhandled Error... Please contact the CML-Planos team')
+    VALUES ( 2, 'Unhandled Error... Please contact the CML-Planos team')
 
   SELECT
     Num
