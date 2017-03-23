@@ -23,6 +23,7 @@ GO
 
 CREATE PROCEDURE [dbo].CUP_SPP_wsPolizasContables_Validar              
 AS BEGIN TRY
+  
   PRINT('.Validando.')
 
   DECLARE 
@@ -94,12 +95,14 @@ AS BEGIN TRY
   )
   SELECT 
     Num =  3,
-    [Description] = 'El tipo de póliza "' + header.Tipo + '" no es valido'
+    [Description] = 'La sucursal contable "'
+                   + CAST(header.SucursalContable AS VARCHAR)
+                   + '" no existe.'
   FROM 
     #tmp_wsPolizasIntelisis_Header header
-  LEFT JOIN MovValidos mov ON mov.Movimiento = header.Tipo
+  LEFT JOIN Sucursal Suc ON Suc.Sucursal = header.SucursalContable
   WHERE 
-    mov.Movimiento IS NULL
+    Suc.Sucursal IS NULL
 
   -- Valida las cuentas contables
   INSERT INTO #tmp_wsPolizasIntelisis_Messages
@@ -118,6 +121,7 @@ AS BEGIN TRY
   WHERE 
     Cta.Cuenta IS NULL
 
+ 
   -- Valida que los centros de costos.
   IF ISNULL(@CfgCentrosCostos,0) = 0
   BEGIN
@@ -157,7 +161,8 @@ AS BEGIN TRY
     LEFT JOIN CentroCostos ON CentroCostos.CentroCostos = record.SubCuenta
                           AND ISNULL(CentroCostos.EsAcumulativo,0) = 0
     WHERE 
-      CentroCostos.CentroCostos IS NULL
+      ISNULL(record.SubCuenta,'') <> ''
+    AND CentroCostos.CentroCostos IS NULL
 
     -- Valida que no se esten usando centros de costos para cuentas contables
     -- que no han sido configuradas para usarlos.
@@ -219,11 +224,11 @@ AS BEGIN TRY
     LEFT JOIN CtaSub ON CtaSub.Cuenta = record.Cuenta
                    AND CtaSub.SubCuenta = record.SubCuenta
     WHERE
-      ISNULL(Cta.CentroCostos,0) = 1
-    AND CtaSub.CentroCostos IS NULL
+      ISNULL(Cta.CentrosCostos,0) = 1
+    AND ISNULL(record.SubCuenta,'') <> ''
+    AND CtaSub.SubCuenta IS NULL
   
   END
- 
 END TRY
 BEGIN CATCH
  IF OBJECT_ID('tempdb..#tmp_wsPolizasIntelisis_Messages') IS NOT NULL
