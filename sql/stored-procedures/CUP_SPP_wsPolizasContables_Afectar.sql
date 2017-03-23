@@ -27,6 +27,8 @@ CREATE PROCEDURE [dbo].CUP_SPP_wsPolizasContables_Afectar
   @Ok INT OUTPUT,
   @OkRef VARCHAR(255) OUTPUT 
 AS BEGIN TRY
+  
+  SET NOCOUNT ON;
 
   PRINT('.Afectando.')
 

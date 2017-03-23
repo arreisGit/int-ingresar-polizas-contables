@@ -26,6 +26,9 @@ CREATE PROCEDURE [dbo].CUP_SPP_wsPolizasContables
  @Poliza XML(JournalEntrySchema)
 )                
 AS BEGIN TRY
+
+  SET NOCOUNT ON;
+
   DECLARE 
     @PolizaID INT,
     @Ok INT,

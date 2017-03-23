@@ -23,6 +23,8 @@ GO
 
 CREATE PROCEDURE [dbo].CUP_SPP_wsPolizasContables_Validar              
 AS BEGIN TRY
+
+  SET NOCOUNT ON;
   
   PRINT('.Validando.')
 

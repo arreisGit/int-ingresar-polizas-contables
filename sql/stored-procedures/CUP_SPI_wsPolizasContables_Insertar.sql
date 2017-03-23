@@ -24,6 +24,8 @@ GO
 CREATE PROCEDURE [dbo].CUP_SPI_wsPolizasContables_Insertar    
     @PolizaID INT OUTPUT         
 AS BEGIN TRY
+  
+  SET NOCOUNT ON;
 
   PRINT('.Insertando.')
 
