@@ -31,7 +31,9 @@ AS BEGIN TRY
     @Tipo CHAR(20),
     @FechaContable DATE,
     @SucursalContable INT,
-    @CfgCentrosCostos BIT = 0
+    @CfgCentrosCostos BIT = 0,
+    @CfgToleraciaRedondeo FLOAT = 0.0,
+    @Diff FLOAT
 
   SELECT 
     @Sistema = Sistema,
@@ -42,7 +44,8 @@ AS BEGIN TRY
     #tmp_wsPolizasIntelisis_Header
 
   SELECT
-    @CfgCentrosCostos = ContCentrosCostos
+    @CfgCentrosCostos = ContCentrosCostos,
+    @CfgToleraciaRedondeo = ISNULL(ContToleraciaRedondeo, 0.0)
   FROM
     EmpresaCfg
   WHERE
@@ -229,6 +232,28 @@ AS BEGIN TRY
     AND CtaSub.SubCuenta IS NULL
   
   END
+  
+
+  SELECT 
+    @Diff = ABS(SUM(ISNULL(record.Debe,0) - ISNULL(record.Haber,0)))
+  FROM 
+    #tmp_wsPolizasIntelisis_Records record
+
+  -- Valida la suma del Debe y el Haber.
+  IF @Diff > ISNULL(@CfgToleraciaRedondeo,0)
+  BEGIN
+    INSERT INTO #tmp_wsPolizasIntelisis_Messages
+    ( 
+      NUM, 
+      [Description] 
+    )
+    SELECT
+      NUM = 3,
+      [Description] = 'La suma del DEBE difiere con la suma del HABER en '
+                    + CAST(ISNULL(@Diff,0) AS VARCHAR)
+                    + ' pesos.'
+  END
+
 END TRY
 BEGIN CATCH
  IF OBJECT_ID('tempdb..#tmp_wsPolizasIntelisis_Messages') IS NOT NULL
