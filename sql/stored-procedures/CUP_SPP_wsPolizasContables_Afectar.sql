@@ -68,7 +68,7 @@ AS BEGIN TRY
 
   IF (
         @OK IS NULL 
-     OR @Ok BETWEEN 80030 AND 81000 
+     OR @Ok BETWEEN 80000 AND 81000 
      ) 
   AND NOT EXISTS (
                     SELECT

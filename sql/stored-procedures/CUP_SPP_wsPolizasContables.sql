@@ -162,7 +162,7 @@ AS BEGIN TRY
         @OkRef  = @OKREF OUTPUT
     END 
 
-    IF NOT( @OK IS  NULL OR @Ok BETWEEN 80030 AND 81000 )
+    IF NOT( @OK IS  NULL OR @Ok BETWEEN 80000 AND 81000 )
       THROW @Ok, @OkRef, 4;
     
     IF XACT_STATE() = 1
