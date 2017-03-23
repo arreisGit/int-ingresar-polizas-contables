@@ -24,8 +24,11 @@ GO
 CREATE PROCEDURE [dbo].CUP_SPI_wsPolizasContables_Insertar    
     @PolizaID INT OUTPUT         
 AS BEGIN TRY
+
+  PRINT('.Insertando.')
+
   DECLARE 
-    @CUP_Proceso INT = 18,
+    @CUP_Proceso INT = 17,
     @HOY DATETIME = GETDATE()
  
   INSERT INTO 
@@ -49,22 +52,22 @@ AS BEGIN TRY
   )
   SELECT 
     CUP_Origen = @CUP_Proceso,
-    CUP_OrigenId = Sistema,
-    Mov = Tipo,
+    CUP_OrigenId = header.Sistema,
+    Mov = header.Tipo,
     FechaEmision = CAST(@HOY AS DATE),
-    FechaContable = CAST(FechaContable AS DATE),
+    FechaContable = CAST(header.FechaContable AS DATE),
     FechaRegistro = @HOY,
     Empresa = 'CML',
-    Sucursal = SucursalContable,
-    Concepto = NULLIF(Concepto,''),
-    Referencia = NULLIF(Referencia,''),
+    Sucursal = header.SucursalContable,
+    Concepto = NULLIF(header.Concepto,''),
+    Referencia = NULLIF(header.Referencia,''),
     Usuario = 'PRODAUT',
     Moneda = 'Pesos',
     TipoCambio = 1,
     Estatus = 'SINAFECTAR',
-    SucursalOrigen = SucursalContable
+    SucursalOrigen = header.SucursalContable
   FROM 
-    #tmp_wsPolizasIntelisis_Header
+    #tmp_wsPolizasIntelisis_Header header
 
   SET @PolizaID = SCOPE_IDENTITY()
 
@@ -100,17 +103,17 @@ AS BEGIN TRY
                                       detalle.Cuenta,
                                       detalle.Subcuenta 
                                     ORDER BY
-                                      su.Subcuenta
+                                      detalle.Subcuenta
                                     ) - 1
     ,detalle.Cuenta
-    ,NULLIF(detalle.SubCuenta,'')
+    ,SubCuenta = NULLIF(detalle.SubCuenta,'')
     ,Concepto = NULLIF(detalle.Concepto,'')
     ,detalle.Debe
     ,detalle.Haber
     ,Empresa = 'CML'
-    ,cabecero.SucursalContable
-    ,cabecero.SucursalContable
-    ,cabecero.SucursalContable
+    ,Sucursal = cabecero.SucursalContable
+    ,SucursalContable = cabecero.SucursalContable
+    ,SucursalOrigen =cabecero.SucursalContable
     --,MonedaOriginal
     --,TipoCambioOriginal
     FROM 
